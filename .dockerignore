@@ -1,0 +1,22 @@
+# Python
+bagu-backend/venv/
+**/__pycache__/
+*.pyc
+
+# Node
+bagu-frontend/node_modules/
+bagu-frontend/dist/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Claude
+CLAUDE.md

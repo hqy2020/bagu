@@ -1,0 +1,6 @@
+django>=4.2,<5.0
+djangorestframework>=3.14
+django-cors-headers>=4.0
+openai>=1.0
+python-frontmatter>=1.0
+markdown>=3.4

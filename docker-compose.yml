@@ -1,0 +1,13 @@
+services:
+  bagu:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      # 可选：持久化数据库到宿主机，防止容器重建丢失答题记录
+      - bagu-data:/app/db-data
+    environment:
+      - PYTHONUNBUFFERED=1
+
+volumes:
+  bagu-data:
