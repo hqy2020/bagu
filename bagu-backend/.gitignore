@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 venv/
-# db.sqlite3 — 保留在仓库中，包含预置题目和模型配置
+db.sqlite3
 db.sqlite3-shm
 db.sqlite3-wal
 

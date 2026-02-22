@@ -7,6 +7,7 @@ process.env.NO_PROXY = 'localhost,127.0.0.1'
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: '0.0.0.0',
     port: 3000,
     proxy: {
       '/api': {
@@ -22,5 +23,9 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 3000,
   },
 })

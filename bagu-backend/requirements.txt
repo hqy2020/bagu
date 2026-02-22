@@ -4,3 +4,4 @@ django-cors-headers>=4.0
 openai>=1.0
 python-frontmatter>=1.0
 markdown>=3.4
+redis>=5.0

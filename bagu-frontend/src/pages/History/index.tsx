@@ -1,32 +1,54 @@
-import { useState, useEffect } from 'react'
-import { Table, Tag, Typography, Spin, Empty } from 'antd'
+import { useState, useEffect, useCallback } from 'react'
+import { Table, Tag, Typography, Spin, Empty, Select, Space } from 'antd'
 import { useNavigate } from 'react-router-dom'
-import { useUserStore } from '../../stores/userStore'
-import { getAnswerHistory, type AnswerResult } from '../../api'
+import { getAnswerHistory, getUsers, type AnswerResult, type BaguUser } from '../../api'
+import useAutoRefresh from '../../hooks/useAutoRefresh'
 
 const { Title } = Typography
 
 export default function History() {
-  const { currentUser } = useUserStore()
+  const [users, setUsers] = useState<BaguUser[]>([])
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
   const [records, setRecords] = useState<AnswerResult[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    if (!currentUser) {
-      setLoading(false)
-      return
+  const loadUsers = useCallback(async () => {
+    const res = await getUsers()
+    const data = Array.isArray(res.data) ? res.data : (res.data as any).results || []
+    setUsers(data)
+    if (!selectedUserId && data.length > 0) {
+      setSelectedUserId(data[0].id)
     }
-    getAnswerHistory(currentUser.id)
-      .then(res => {
-        const data = Array.isArray(res.data) ? res.data : (res.data as any).results || []
-        setRecords(data)
-      })
-      .finally(() => setLoading(false))
-  }, [currentUser])
+  }, [selectedUserId])
 
-  if (loading) return <Spin size="large" style={{ display: 'block', marginTop: 100 }} />
-  if (!currentUser) return <Empty description="请先选择用户" />
+  useEffect(() => {
+    void loadUsers()
+  }, [loadUsers])
+
+  const loadHistory = useCallback(async (showLoading = false) => {
+    if (!selectedUserId) return
+    if (showLoading) setLoading(true)
+    try {
+      const res = await getAnswerHistory(selectedUserId)
+      const data = Array.isArray(res.data) ? res.data : (res.data as any).results || []
+      setRecords(data)
+    } finally {
+      if (showLoading) setLoading(false)
+    }
+  }, [selectedUserId])
+
+  useEffect(() => {
+    if (!selectedUserId) return
+    void loadHistory(true)
+  }, [selectedUserId, loadHistory])
+
+  useAutoRefresh(
+    async () => {
+      await Promise.all([loadUsers(), loadHistory(false)])
+    },
+    { enabled: Boolean(selectedUserId), intervalMs: 3000 },
+  )
 
   const columns = [
     {
@@ -68,13 +90,31 @@ export default function History() {
 
   return (
     <div>
-      <Title level={3}>答题历史</Title>
-      <Table
-        dataSource={records}
-        columns={columns}
-        rowKey="id"
-        pagination={{ pageSize: 15 }}
-      />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <Title level={3} style={{ margin: 0 }}>答题历史</Title>
+        <Space>
+          <span>选择用户：</span>
+          <Select
+            value={selectedUserId}
+            onChange={setSelectedUserId}
+            options={users.map(u => ({ value: u.id, label: u.nickname || u.username }))}
+            placeholder="选择用户"
+            style={{ width: 160 }}
+          />
+        </Space>
+      </div>
+      {!selectedUserId ? (
+        <Empty description="请选择用户查看历史记录" />
+      ) : loading ? (
+        <Spin size="large" style={{ display: 'block', marginTop: 100 }} />
+      ) : (
+        <Table
+          dataSource={records}
+          columns={columns}
+          rowKey="id"
+          pagination={{ pageSize: 15 }}
+        />
+      )}
     </div>
   )
 }

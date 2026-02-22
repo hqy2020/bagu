@@ -48,6 +48,6 @@ RUN chmod 666 /app/db.sqlite3
 # collectstatic
 RUN python manage.py collectstatic --noinput
 
-EXPOSE 8080
+EXPOSE 9000 9001
 
 ENTRYPOINT ["/entrypoint.sh"]

@@ -1,13 +1,24 @@
 services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - bagu-redis-data:/data
+
   bagu:
     build: .
+    depends_on:
+      - redis
     ports:
-      - "8080:8080"
+      - "9000:9000"
+      - "9001:9001"
     volumes:
       # 可选：持久化数据库到宿主机，防止容器重建丢失答题记录
       - bagu-data:/app/db-data
     environment:
       - PYTHONUNBUFFERED=1
+      - REDIS_URL=redis://redis:6379/1
 
 volumes:
   bagu-data:
+  bagu-redis-data:

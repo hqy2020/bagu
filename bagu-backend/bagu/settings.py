@@ -3,6 +3,7 @@ Django settings for bagu project.
 八股备考网站 - 局域网版
 """
 
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -16,6 +17,14 @@ ALLOWED_HOSTS = ['*']  # 局域网访问
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8080',
     'http://127.0.0.1:8080',
+    'http://localhost:9000',
+    'http://127.0.0.1:9000',
+    'http://localhost:9001',
+    'http://127.0.0.1:9001',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
 ]
 
 INSTALLED_APPS = [
@@ -40,7 +49,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'bagu.middleware.LanCsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -99,6 +108,17 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
+}
+
+# Cache - 默认使用 Redis（可通过环境变量覆盖）
+REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/1')
+API_CACHE_TTL = int(os.getenv('API_CACHE_TTL', '300'))
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': REDIS_URL,
+        'TIMEOUT': API_CACHE_TTL,
+    }
 }
 
 # 八股文源目录（导入用）

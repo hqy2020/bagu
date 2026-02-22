@@ -6,6 +6,9 @@ export interface SSECallbacks {
   onThinking?: (content: string) => void
   onContent?: (content: string) => void
   onResult?: (data: any) => void
+  onCorrection?: (data: { original: string; corrected: string }) => void
+  onFollowUpResult?: (data: any) => void
+  onBattleResult?: (data: any) => void
   onError?: (detail: string) => void
   onDone?: () => void
 }
@@ -71,6 +74,15 @@ export async function fetchSSE(
             break
           case 'result':
             callbacks.onResult?.(parsed)
+            break
+          case 'correction':
+            callbacks.onCorrection?.(parsed)
+            break
+          case 'followup_result':
+            callbacks.onFollowUpResult?.(parsed)
+            break
+          case 'battle_result':
+            callbacks.onBattleResult?.(parsed)
             break
           case 'error':
             callbacks.onError?.(parsed.detail)

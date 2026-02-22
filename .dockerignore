@@ -1,5 +1,8 @@
 # Python
 bagu-backend/venv/
+bagu-backend/db.sqlite3
+bagu-backend/db.sqlite3-shm
+bagu-backend/db.sqlite3-wal
 **/__pycache__/
 *.pyc
 
