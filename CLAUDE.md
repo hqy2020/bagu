@@ -24,7 +24,7 @@ bash ../../start-bagu.sh
 ```bash
 cd bagu-backend
 source venv/bin/activate
-python manage.py runserver 0.0.0.0:8000     # 开发服务器
+python manage.py runserver 0.0.0.0:10011    # 开发服务器
 python manage.py migrate                     # 数据库迁移
 python manage.py import_questions            # 从 Obsidian 导入题目
 python manage.py import_questions --dry-run  # 预演模式
@@ -35,7 +35,7 @@ python manage.py import_questions /path/dir  # 指定目录导入
 ```bash
 cd bagu-frontend
 npm install          # 安装依赖
-npm run dev          # 开发服务器 (port 3000)
+npm run dev          # 开发服务器 (port 10012)
 npm run build        # 生产构建
 npm run lint         # ESLint 检查
 ```
@@ -72,9 +72,9 @@ npm run lint         # ESLint 检查
 ```
 
 ### Vite 代理配置
-- `/api` → `http://127.0.0.1:8000`
-- `/admin` → `http://127.0.0.1:8000`
-- `/static` → `http://127.0.0.1:8000`
+- `/api` → `http://127.0.0.1:10011`
+- `/admin` → `http://127.0.0.1:10011`
+- `/static` → `http://127.0.0.1:10011`
 
 ## 核心业务流
 

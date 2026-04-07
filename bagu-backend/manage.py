@@ -9,7 +9,7 @@ def _apply_lan_default_for_runserver():
     if len(sys.argv) < 2 or sys.argv[1] != 'runserver':
         return
     if len(sys.argv) == 2 or (len(sys.argv) > 2 and sys.argv[2].startswith('-')):
-        sys.argv.insert(2, '0.0.0.0:8000')
+        sys.argv.insert(2, '0.0.0.0:10011')
 
 
 def main():

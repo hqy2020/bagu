@@ -72,6 +72,6 @@ def _lan_origin_relax_enabled():
 
 
 def _lan_allowed_ports():
-    raw = os.getenv('LAN_CSRF_ALLOWED_PORTS', '9000,9001,8000,3000')
+    raw = os.getenv('LAN_CSRF_ALLOWED_PORTS', '9000,9001,8000,3000,10011,10012')
     parts = [item.strip() for item in raw.split(',')]
     return {item for item in parts if item}

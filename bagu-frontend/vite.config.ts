@@ -8,24 +8,24 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    port: 3000,
+    port: 10012,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8000',
+        target: 'http://127.0.0.1:10011',
         changeOrigin: true,
       },
       '/admin': {
-        target: 'http://127.0.0.1:8000',
+        target: 'http://127.0.0.1:10011',
         changeOrigin: true,
       },
       '/static': {
-        target: 'http://127.0.0.1:8000',
+        target: 'http://127.0.0.1:10011',
         changeOrigin: true,
       },
     },
   },
   preview: {
     host: '0.0.0.0',
-    port: 3000,
+    port: 10012,
   },
 })
