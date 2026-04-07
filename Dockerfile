@@ -16,6 +16,7 @@ FROM python:3.9-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV SQLITE_PATH=/data/db.sqlite3
 
 # 安装 nginx 和 supervisor
 RUN apt-get update && \
@@ -30,9 +31,6 @@ RUN pip install --no-cache-dir -r requirements.txt gunicorn
 # 复制后端代码
 COPY bagu-backend/ ./
 
-# 复制已导入题目的数据库
-COPY bagu-backend/db.sqlite3 ./db.sqlite3
-
 # 复制前端构建产物
 COPY --from=frontend-build /app/frontend/dist /var/www/frontend
 
@@ -42,8 +40,8 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# 确保 SQLite 数据库文件可写
-RUN chmod 666 /app/db.sqlite3
+# 预创建持久化目录，首次启动时由 migrate 自动创建 SQLite 文件
+RUN mkdir -p /data
 
 # collectstatic
 RUN python manage.py collectstatic --noinput

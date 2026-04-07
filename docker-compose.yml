@@ -7,17 +7,18 @@ services:
 
   bagu:
     build: .
+    restart: unless-stopped
     depends_on:
       - redis
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${PORT:-9000}:9000"
+      - "${PORT2:-9001}:9001"
     volumes:
-      # 可选：持久化数据库到宿主机，防止容器重建丢失答题记录
-      - bagu-data:/app/db-data
+      - bagu-data:/data
     environment:
       - PYTHONUNBUFFERED=1
       - REDIS_URL=redis://redis:6379/1
+      - SQLITE_PATH=/data/db.sqlite3
 
 volumes:
   bagu-data:

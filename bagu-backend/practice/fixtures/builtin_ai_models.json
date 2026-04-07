@@ -1,0 +1,67 @@
+[
+  {
+    "model": "practice.aimodelconfig",
+    "pk": 1,
+    "fields": {
+      "name": "DeepSeek-R1",
+      "provider": "compshare",
+      "api_key": "",
+      "base_url": "https://api.modelverse.cn/v1/",
+      "model_name": "deepseek-ai/DeepSeek-R1",
+      "is_enabled": true,
+      "is_default": true
+    }
+  },
+  {
+    "model": "practice.aimodelconfig",
+    "pk": 2,
+    "fields": {
+      "name": "GPT-5.1 Chat",
+      "provider": "compshare",
+      "api_key": "",
+      "base_url": "https://api.modelverse.cn/v1/",
+      "model_name": "gpt-5.1-chat",
+      "is_enabled": true,
+      "is_default": false
+    }
+  },
+  {
+    "model": "practice.aimodelconfig",
+    "pk": 3,
+    "fields": {
+      "name": "Doubao Seed 1.6",
+      "provider": "compshare",
+      "api_key": "",
+      "base_url": "https://api.modelverse.cn/v1/",
+      "model_name": "ByteDance/doubao-seed-1.6",
+      "is_enabled": true,
+      "is_default": false
+    }
+  },
+  {
+    "model": "practice.aimodelconfig",
+    "pk": 4,
+    "fields": {
+      "name": "Grok 4.1 Fast Non Reasoning",
+      "provider": "compshare",
+      "api_key": "",
+      "base_url": "https://api.modelverse.cn/v1/",
+      "model_name": "grok-4-1-fast-non-reasoning",
+      "is_enabled": true,
+      "is_default": false
+    }
+  },
+  {
+    "model": "practice.aimodelconfig",
+    "pk": 5,
+    "fields": {
+      "name": "Gemini 2.5 Flash",
+      "provider": "compshare",
+      "api_key": "",
+      "base_url": "https://api.modelverse.cn/v1/",
+      "model_name": "gemini-2.5-flash",
+      "is_enabled": true,
+      "is_default": false
+    }
+  }
+]

@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+SQLITE_PATH = os.getenv('SQLITE_PATH')
 
 SECRET_KEY = 'django-insecure-bagu-dev-key-change-in-production'
 
@@ -25,6 +26,10 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:3000',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+    'http://localhost:10011',
+    'http://127.0.0.1:10011',
+    'http://localhost:10012',
+    'http://127.0.0.1:10012',
 ]
 
 INSTALLED_APPS = [
@@ -79,7 +84,7 @@ WSGI_APPLICATION = 'bagu.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': Path(SQLITE_PATH) if SQLITE_PATH else BASE_DIR / 'db.sqlite3',
         'OPTIONS': {
             'timeout': 20,  # 等待锁超时（秒），支持多流并发写入
         },
