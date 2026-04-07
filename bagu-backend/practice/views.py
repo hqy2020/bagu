@@ -286,7 +286,7 @@ def get_question_history(request):
         user_id=user_id, question_id=question_id
     ).select_related('question', 'question__category').order_by('-created_at')[:10]
 
-    data = AnswerRecordListSerializer(records, many=True).data
+    data = AnswerRecordSerializer(records, many=True).data
     return JsonResponse(data, safe=False)
 
 

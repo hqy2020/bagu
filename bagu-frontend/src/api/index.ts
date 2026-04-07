@@ -88,6 +88,11 @@ export interface AnswerRecordListItem {
   ai_score: number
   ai_model_name: string
   created_at: string
+  // 完整字段（来自 AnswerRecordSerializer）
+  ai_highlights?: string[]
+  ai_missing_points?: string[]
+  ai_suggestion?: string
+  user_answer?: string
 }
 
 export interface EvaluationRound {

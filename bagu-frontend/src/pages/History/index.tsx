@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { getAnswerHistory, getUsers, type AnswerResult, type BaguUser } from '../../api'
 import useAutoRefresh from '../../hooks/useAutoRefresh'
 
-const { Title } = Typography
+const { Title, Text, Paragraph } = Typography
 
 export default function History() {
   const [users, setUsers] = useState<BaguUser[]>([])
@@ -113,6 +113,67 @@ export default function History() {
           columns={columns}
           rowKey="id"
           pagination={{ pageSize: 15 }}
+          expandable={{
+            rowExpandable: (record) =>
+              !!record.ai_suggestion || (record.ai_highlights?.length ?? 0) > 0,
+            expandedRowRender: (record) => (
+              <div style={{ padding: '8px 16px' }}>
+                {record.user_answer && (
+                  <div style={{ marginBottom: 12 }}>
+                    <Text strong>我的答案</Text>
+                    <Paragraph
+                      ellipsis={{ rows: 3, expandable: true, symbol: '展开' }}
+                      style={{ marginTop: 4, marginBottom: 0, color: '#555' }}
+                    >
+                      {record.user_answer}
+                    </Paragraph>
+                  </div>
+                )}
+                {(record.ai_highlights?.length ?? 0) > 0 && (
+                  <div style={{ marginBottom: 10 }}>
+                    <Text strong style={{ color: '#389e0d' }}>亮点</Text>
+                    <div style={{ marginTop: 4, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {record.ai_highlights!.map((h, i) => (
+                        <Tag key={i} color="green">{h}</Tag>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {(record.ai_missing_points?.length ?? 0) > 0 && (
+                  <div style={{ marginBottom: 10 }}>
+                    <Text strong style={{ color: '#d46b08' }}>遗漏要点</Text>
+                    <div style={{ marginTop: 4, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {record.ai_missing_points!.map((p, i) => (
+                        <Tag key={i} color="orange">{p}</Tag>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {record.ai_suggestion && (
+                  <div style={{ marginBottom: record.ai_improved_answer ? 10 : 0 }}>
+                    <Text strong>AI 建议</Text>
+                    <Paragraph style={{ marginTop: 4, marginBottom: 0 }}>{record.ai_suggestion}</Paragraph>
+                  </div>
+                )}
+                {record.ai_improved_answer && (
+                  <div>
+                    <Text strong>AI 改进版答案</Text>
+                    <pre style={{
+                      marginTop: 4,
+                      padding: '8px 12px',
+                      background: '#f6ffed',
+                      border: '1px solid #b7eb8f',
+                      borderRadius: 4,
+                      whiteSpace: 'pre-wrap',
+                      fontSize: 13,
+                    }}>
+                      {record.ai_improved_answer}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            ),
+          }}
         />
       )}
     </div>

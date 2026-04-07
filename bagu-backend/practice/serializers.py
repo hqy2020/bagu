@@ -39,7 +39,9 @@ class AnswerRecordListSerializer(serializers.ModelSerializer):
     class Meta:
         model = AnswerRecord
         fields = ['id', 'question', 'question_title', 'category_name',
-                  'ai_score', 'ai_model_name', 'created_at']
+                  'ai_score', 'ai_model_name', 'created_at',
+                  'user_answer', 'ai_highlights', 'ai_missing_points',
+                  'ai_suggestion', 'ai_improved_answer']
 
 
 class EvaluationRoundSerializer(serializers.ModelSerializer):

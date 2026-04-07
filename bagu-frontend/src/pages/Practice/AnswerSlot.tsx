@@ -77,18 +77,12 @@ export default function AnswerSlot({ slot, users, disabled, removable, questionI
               </Space>
             ),
             children: (
-              <div>
-                {history.map(record => (
-                  <div
-                    key={record.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '4px 0',
-                      borderBottom: '1px solid #f0f0f0',
-                    }}
-                  >
+              <Collapse
+                size="small"
+                ghost
+                items={history.map(record => ({
+                  key: record.id,
+                  label: (
                     <Space size={4}>
                       <Tag color={record.ai_score >= 80 ? 'green' : record.ai_score >= 60 ? 'orange' : 'red'}>
                         {record.ai_score}分
@@ -100,9 +94,39 @@ export default function AnswerSlot({ slot, users, disabled, removable, questionI
                         {new Date(record.created_at).toLocaleDateString()}
                       </Text>
                     </Space>
-                  </div>
-                ))}
-              </div>
+                  ),
+                  children: (
+                    <div style={{ fontSize: 12, lineHeight: 1.6 }}>
+                      {record.ai_missing_points && record.ai_missing_points.length > 0 && (
+                        <div style={{ marginBottom: 6 }}>
+                          <Text type="secondary" style={{ fontSize: 11 }}>遗漏的点：</Text>
+                          <div style={{ marginTop: 2 }}>
+                            {record.ai_missing_points.map((pt, i) => (
+                              <Tag key={i} color="red" style={{ marginBottom: 4, whiteSpace: 'normal' }}>{pt}</Tag>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {record.ai_highlights && record.ai_highlights.length > 0 && (
+                        <div style={{ marginBottom: 6 }}>
+                          <Text type="secondary" style={{ fontSize: 11 }}>主要亮点：</Text>
+                          <div style={{ marginTop: 2 }}>
+                            {record.ai_highlights.map((hl, i) => (
+                              <Tag key={i} color="green" style={{ marginBottom: 4, whiteSpace: 'normal' }}>{hl}</Tag>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {record.ai_suggestion && (
+                        <div>
+                          <Text type="secondary" style={{ fontSize: 11 }}>改进建议：</Text>
+                          <Text style={{ fontSize: 11, color: '#595959' }}>{record.ai_suggestion}</Text>
+                        </div>
+                      )}
+                    </div>
+                  ),
+                }))}
+              />
             ),
           }]}
         />

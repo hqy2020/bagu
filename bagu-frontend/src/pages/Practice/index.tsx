@@ -45,7 +45,7 @@ function newSlotId() {
 export default function Practice() {
   const { questionId } = useParams()
   const navigate = useNavigate()
-  const { currentUser } = useUserStore()
+  const { currentUser, setCurrentUser } = useUserStore()
   const [question, setQuestion] = useState<Question | null>(null)
   const [loading, setLoading] = useState(true)
   const [showAnswer, setShowAnswer] = useState(false)
@@ -73,13 +73,26 @@ export default function Practice() {
       const data = res.data as any
       const list: BaguUser[] = data?.results || data || []
       setUsers(list)
+      // 如果当前用户不存在或不在列表里，默认选第一个（胡启云），并同步到 slot
+      if (list.length > 0 && (!currentUser || !list.find(u => u.id === currentUser.id))) {
+        const firstUser = list[0]
+        setCurrentUser(firstUser)
+        setSlots(prev => prev.map((s, i) => i === 0 ? { ...s, userId: firstUser.id } : s))
+      }
     })
     getAiModels().then(res => {
       const data = Array.isArray(res.data) ? res.data : (res.data as any).results || []
       const enabled = data.filter((item: AiModel) => item.is_enabled)
       setAiModels(enabled)
-      const defaultModel = enabled.find((item: AiModel) => item.is_default) || enabled[0]
-      setSelectedModelIds(defaultModel?.id ? [defaultModel.id] : [])
+      // 默认选中 grok、gemini、gpt 三个模型
+      const preferredIds = enabled
+        .filter((item: AiModel) =>
+          /grok/i.test(item.model_name) ||
+          /gemini/i.test(item.model_name) ||
+          /gpt/i.test(item.model_name)
+        )
+        .map((item: AiModel) => item.id)
+      setSelectedModelIds(preferredIds.length > 0 ? preferredIds : (enabled[0]?.id ? [enabled[0].id] : []))
     })
     getAiRoles().then(res => {
       const data = Array.isArray(res.data) ? res.data : (res.data as any).results || []
@@ -409,13 +422,20 @@ export default function Practice() {
     setPhase('result')
   }, [slots, question, users, selectedModelIds, selectedRoleKey, aiRoles, aiModels])
 
-  const handleNext = async () => {
+  const handleNext = () => {
     if (!question) return
-    try {
-      const res = await getRandomQuestion(question.category)
-      navigate(`/practice/${res.data.id}`)
-    } catch {
-      message.info('该分类暂无更多题目')
+    if (sidebarQuestions.length > 0) {
+      const currentIdx = sidebarQuestions.findIndex(q => q.id === question.id)
+      if (currentIdx === -1 || currentIdx === sidebarQuestions.length - 1) {
+        message.info('已是本分类最后一题')
+        return
+      }
+      navigate(`/practice/${sidebarQuestions[currentIdx + 1].id}`)
+    } else {
+      // 侧边栏未加载时降级为随机
+      getRandomQuestion(question.category)
+        .then(res => navigate(`/practice/${res.data.id}`))
+        .catch(() => message.info('该分类暂无更多题目'))
     }
   }
 

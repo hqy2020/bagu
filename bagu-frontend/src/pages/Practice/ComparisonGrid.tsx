@@ -89,9 +89,6 @@ function buildUserSummarySpeech(userName: string, score: number | null, results:
   if (!results.length) return ''
 
   const bestResult = getBestResult(results)
-  const modelScores = results
-    .map(result => `${result.ai_model_name}${result.ai_score}分`)
-    .join('，')
 
   const highlights = bestResult?.ai_highlights?.slice(0, 2).map(item => normalizeText(item)).filter(Boolean).join('；') || ''
   const missing = bestResult?.ai_missing_points?.slice(0, 2).map(item => normalizeText(item)).filter(Boolean).join('；') || ''
@@ -101,9 +98,8 @@ function buildUserSummarySpeech(userName: string, score: number | null, results:
   const speech = [
     `${userName}本题整体评估如下。`,
     `综合得分${scoreText}。`,
-    modelScores ? `各模型评分：${modelScores}。` : '',
-    highlights ? `主要亮点：${highlights}。` : '',
     missing ? `优先补强：${missing}。` : '',
+    highlights ? `主要亮点：${highlights}。` : '',
     suggestion ? `改进建议：${suggestion}。` : '',
   ].filter(Boolean).join('')
 
