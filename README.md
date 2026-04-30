@@ -66,7 +66,12 @@ cd ..
 
 ### 配置 AI
 
-打开 **http://localhost:9000/admin/**（自动免密登录）→ **AI 模型配置** → 填入 API Key → 保存。
+打开 **http://localhost:9000/admin/** — 自动免密登录。如果浏览器弹出了登录页，用下面账号手动登：
+
+- **账号：** `admin`
+- **密码：** `admin`
+
+进去后点击 **AI 模型配置** → 填入 API Key → 保存。
 
 预置模型：DeepSeek-R1、GPT-5.1、Doubao Seed 1.6、Grok 4.1、Gemini 2.5 Flash
 
