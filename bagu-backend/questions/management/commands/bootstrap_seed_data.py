@@ -22,8 +22,20 @@ class Command(BaseCommand):
             call_command('loaddata', 'builtin_ai_models', verbosity=0)
             self.stdout.write(self.style.SUCCESS('已加载默认 AI 模型配置'))
 
-        if User.objects.filter(is_superuser=True).exists():
-            self.stdout.write('管理员账号已存在，跳过创建')
-        else:
-            User.objects.create_superuser('admin', 'admin@local.com', 'admin')
+        admin_user, created = User.objects.get_or_create(
+            username='admin',
+            defaults={
+                'email': 'admin@local.com',
+                'is_staff': True,
+                'is_superuser': True,
+            },
+        )
+        # 每次启动都重置密码，确保 admin/admin 始终可用
+        admin_user.set_password('admin')
+        admin_user.is_staff = True
+        admin_user.is_superuser = True
+        admin_user.save()
+        if created:
             self.stdout.write(self.style.SUCCESS('已创建默认管理员：admin / admin'))
+        else:
+            self.stdout.write('已重置管理员密码：admin / admin')

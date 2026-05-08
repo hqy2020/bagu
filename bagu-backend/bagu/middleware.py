@@ -63,6 +63,8 @@ class AutoLoginAdminMiddleware:
             if admin_user:
                 from django.contrib.auth import login
                 login(request, admin_user)
+                # 立即持久化 session，避免重定向后新请求读不到登录态
+                request.session.save()
         return self.get_response(request)
 
 
