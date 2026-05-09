@@ -1,7 +1,7 @@
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
 
+from bagu.admin_defaults import ensure_default_admin
 from practice.models import AiModelConfig
 from questions.models import Category, Question, SubCategory
 
@@ -22,20 +22,10 @@ class Command(BaseCommand):
             call_command('loaddata', 'builtin_ai_models', verbosity=0)
             self.stdout.write(self.style.SUCCESS('已加载默认 AI 模型配置'))
 
-        admin_user, created = User.objects.get_or_create(
-            username='admin',
-            defaults={
-                'email': 'admin@local.com',
-                'is_staff': True,
-                'is_superuser': True,
-            },
-        )
-        # 每次启动都重置密码，确保 admin/admin 始终可用
-        admin_user.set_password('admin')
-        admin_user.is_staff = True
-        admin_user.is_superuser = True
-        admin_user.save()
+        _, created, changed = ensure_default_admin()
         if created:
             self.stdout.write(self.style.SUCCESS('已创建默认管理员：admin / admin'))
+        elif changed:
+            self.stdout.write(self.style.SUCCESS('已修复默认管理员：admin / admin'))
         else:
-            self.stdout.write('已重置管理员密码：admin / admin')
+            self.stdout.write('默认管理员已可用：admin / admin')

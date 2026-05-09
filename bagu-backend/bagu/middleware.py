@@ -4,7 +4,8 @@ import os
 from urllib.parse import urlparse
 
 from django.middleware.csrf import CsrfViewMiddleware
-from django.contrib.auth.models import User
+
+from bagu.admin_defaults import ensure_default_admin
 
 
 class LanCsrfViewMiddleware(CsrfViewMiddleware):
@@ -52,28 +53,23 @@ class LanCsrfViewMiddleware(CsrfViewMiddleware):
 
 
 class AutoLoginAdminMiddleware:
-    """访问 /admin/ 时自动登录为 superuser，无需输入账号密码"""
+    """访问 /admin 时自动登录默认管理员，无需输入账号密码"""
 
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path.startswith('/admin/') and not request.user.is_authenticated:
-            admin_user = User.objects.filter(is_superuser=True).first()
-            if not admin_user:
-                # 兜底：确保默认管理员始终存在（admin / admin）
-                admin_user, _ = User.objects.get_or_create(
-                    username='admin', defaults={'email': 'admin@local.com'}
-                )
-                admin_user.is_staff = True
-                admin_user.is_superuser = True
-                admin_user.set_password('admin')
-                admin_user.save()
+        if _is_admin_path(request.path) and not request.user.is_authenticated:
+            admin_user, _, _ = ensure_default_admin()
             from django.contrib.auth import login
             login(request, admin_user)
             # 立即持久化 session，避免重定向后新请求读不到登录态
             request.session.save()
         return self.get_response(request)
+
+
+def _is_admin_path(path):
+    return path == '/admin' or path.startswith('/admin/')
 
 
 def _lan_origin_relax_enabled():

@@ -3,9 +3,11 @@ from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test import TestCase
 
+from practice.models import AiModelConfig
 from questions.markdown_export import render_questions_markdown
 from questions.models import Category, Question, SubCategory
 
@@ -81,3 +83,74 @@ class MarkdownExportTests(TestCase):
         self.assertIn('Redis 为什么这么快？', content)
         self.assertIn('线程池有哪些核心参数？', content)
         self.assertIn('已导出 2 题到', out.getvalue())
+
+
+class BootstrapSeedDataTests(TestCase):
+    def setUp(self):
+        Category.objects.create(name='Redis')
+        AiModelConfig.objects.create(
+            name='测试模型',
+            provider='test',
+            api_key='test',
+            base_url='https://example.com/v1/',
+            model_name='test-model',
+        )
+
+    def test_bootstrap_creates_default_admin(self):
+        call_command('bootstrap_seed_data', stdout=StringIO())
+
+        user = get_user_model().objects.get(username='admin')
+        self.assertTrue(user.is_staff)
+        self.assertTrue(user.is_superuser)
+        self.assertTrue(user.is_active)
+        self.assertTrue(user.check_password('admin'))
+        self.assertTrue(self.client.login(username='admin', password='admin'))
+
+    def test_bootstrap_repairs_existing_admin(self):
+        user = get_user_model().objects.create_user(
+            username='admin',
+            password='wrong',
+            is_staff=False,
+            is_superuser=False,
+            is_active=False,
+        )
+
+        call_command('bootstrap_seed_data', stdout=StringIO())
+
+        user.refresh_from_db()
+        self.assertTrue(user.is_staff)
+        self.assertTrue(user.is_superuser)
+        self.assertTrue(user.is_active)
+        self.assertTrue(user.check_password('admin'))
+        self.assertTrue(self.client.login(username='admin', password='admin'))
+
+
+class AdminAutoLoginTests(TestCase):
+    def test_admin_autologin_repairs_default_admin(self):
+        get_user_model().objects.create_user(
+            username='admin',
+            password='wrong',
+            is_staff=False,
+            is_superuser=False,
+            is_active=False,
+        )
+
+        response = self.client.get('/admin/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.wsgi_request.user.is_authenticated)
+        self.assertTrue(response.wsgi_request.user.is_superuser)
+
+        user = get_user_model().objects.get(username='admin')
+        self.assertTrue(user.is_staff)
+        self.assertTrue(user.is_superuser)
+        self.assertTrue(user.is_active)
+        self.assertTrue(user.check_password('admin'))
+
+    def test_admin_without_trailing_slash_redirects_then_autologins(self):
+        response = self.client.get('/admin', follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.redirect_chain[-1][0], '/admin/')
+        self.assertTrue(response.wsgi_request.user.is_authenticated)
+        self.assertTrue(response.wsgi_request.user.is_superuser)
