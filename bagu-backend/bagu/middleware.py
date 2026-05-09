@@ -60,11 +60,19 @@ class AutoLoginAdminMiddleware:
     def __call__(self, request):
         if request.path.startswith('/admin/') and not request.user.is_authenticated:
             admin_user = User.objects.filter(is_superuser=True).first()
-            if admin_user:
-                from django.contrib.auth import login
-                login(request, admin_user)
-                # 立即持久化 session，避免重定向后新请求读不到登录态
-                request.session.save()
+            if not admin_user:
+                # 兜底：确保默认管理员始终存在（admin / admin）
+                admin_user, _ = User.objects.get_or_create(
+                    username='admin', defaults={'email': 'admin@local.com'}
+                )
+                admin_user.is_staff = True
+                admin_user.is_superuser = True
+                admin_user.set_password('admin')
+                admin_user.save()
+            from django.contrib.auth import login
+            login(request, admin_user)
+            # 立即持久化 session，避免重定向后新请求读不到登录态
+            request.session.save()
         return self.get_response(request)
 
 
